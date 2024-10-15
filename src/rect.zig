@@ -8,6 +8,8 @@ pub const Options = struct {
     width: f32,
     height: f32,
     position: Position = .{ .absolute = .{ .x = 0, .y = 0 } },
+    border_radius: f32 = 0,
+    overflow: Overflow = .visible,
     color: Color = Color.init(0, 0, 0, 0),
     child: ?*const fn (ctx: *const Context) void = null,
 };
@@ -17,12 +19,13 @@ pub inline fn render(
     y: f32,
     options: *const Options,
 ) void {
-    rl.drawRectangleRec(.{
+    const rec = rl.Rectangle{
         .x = x,
         .y = y,
         .width = options.width,
         .height = options.height,
-    }, options.color);
+    };
+    rl.drawRectangleRounded(rec, options.border_radius / (options.width / 3), 12, options.color);
 }
 
 pub const Alignment = enum {
@@ -121,4 +124,9 @@ pub const Position = union(enum) {
             },
         };
     }
+};
+
+pub const Overflow = enum {
+    visible,
+    hidden,
 };

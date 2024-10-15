@@ -25,6 +25,8 @@ pub fn main() !void {
                 .width = ctx.max_width / 2,
                 .height = ctx.max_height / 4,
                 .color = Color.red,
+                .border_radius = 20,
+                .overflow = .visible,
                 .child = struct {
                     const positions = [_]Rect.Position{
                         Rect.Position.topLeft(),
@@ -46,7 +48,7 @@ pub fn main() !void {
                         Color.orange,
                         Color.brown,
                         Color.white,
-                        Color.init(0, 0, 0, 100),
+                        Color.green,
                     };
                     pub fn render(ctx1: *const Context) void {
                         for (positions, colors) |position, color| {
@@ -54,7 +56,7 @@ pub fn main() !void {
                                 .width = ctx1.max_width / 3,
                                 .height = ctx1.max_height / 3,
                                 .position = position,
-                                .color = color,
+                                .color = color.alpha(0.7),
                             });
                         }
 

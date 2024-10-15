@@ -15,6 +15,39 @@ max_height: f32,
 text_style: Text.Style = .{},
 
 const Self = @This();
+
+const rounded_shader = struct {
+    const rounded_shader_src = @embedFile("assets/shaders/rounded_mask.frag");
+    var loaded: bool = false;
+    var shader: rl.Shader = undefined;
+
+    pub fn load() void {
+        if (loaded) return;
+        defer loaded = true;
+        shader = rl.loadShaderFromMemory(null, rounded_shader_src);
+    }
+
+    pub fn unload() void {
+        if (!loaded) return;
+        defer loaded = false;
+        rl.unloadShader(shader);
+    }
+
+    pub fn begin(radius: f32, width: f32, height: f32) void {
+        if (!loaded) load();
+        const radius_loc = rl.getShaderLocation(shader, "radius");
+        const resolution_loc = rl.getShaderLocation(shader, "resolution");
+        const radius_val: [1]f32 = .{radius};
+        const resolution_val: [2]f32 = .{ width, height };
+        rl.setShaderValue(shader, radius_loc, &radius_val, .shader_uniform_float);
+        rl.setShaderValue(shader, resolution_loc, &resolution_val, .shader_uniform_vec2);
+        rl.beginShaderMode(shader);
+    }
+
+    pub fn end() void {
+        rl.endShaderMode();
+    }
+};
 pub fn rect(
     self: *const Self,
     options: Rect.Options,
@@ -39,6 +72,7 @@ pub fn rect(
     };
     std.debug.assert(y >= 0);
     std.debug.assert(y + options.height <= self.max_height);
+
     Rect.render(
         self.x + x,
         self.y + y,
@@ -54,7 +88,42 @@ pub fn rect(
         .text_style = self.text_style,
     };
     if (options.child) |f| {
-        f(&new_ctx);
+        if (options.border_radius > 0 and options.overflow == .hidden) {
+            const texture = rl.RenderTexture2D.init(
+                @intFromFloat(new_ctx.max_width),
+                @intFromFloat(new_ctx.max_height),
+            );
+            rl.beginTextureMode(texture);
+            rl.clearBackground(rl.Color.init(0, 0, 0, 0));
+            new_ctx.x = 0;
+            new_ctx.y = 0;
+            f(&new_ctx);
+            rl.endTextureMode();
+
+            rounded_shader.begin(options.border_radius * 1.3, new_ctx.max_width, new_ctx.max_height);
+            rl.drawTexturePro(
+                texture.texture,
+                .{
+                    .x = 0,
+                    .y = 0,
+                    .width = new_ctx.max_width,
+                    .height = -new_ctx.max_height,
+                },
+                .{
+                    .x = self.x + x,
+                    .y = self.y + y,
+                    .width = new_ctx.max_width,
+                    .height = new_ctx.max_height,
+                },
+                rl.Vector2.zero(),
+                0,
+                rl.Color.white,
+            );
+            rounded_shader.end();
+            // texture.unload();
+        } else {
+            f(&new_ctx);
+        }
     }
 }
 
