@@ -1,4 +1,5 @@
 const std = @import("std");
+const raylib_zig = @import("raylib-zig");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -7,7 +8,7 @@ pub fn build(b: *std.Build) void {
     const raylib = b.dependency("raylib-zig", .{
         .target = target,
         .optimize = optimize,
-        .linux_display_backend = .Wayland,
+        .linux_display_backend = if (optimize == .Debug) raylib_zig.LinuxDisplayBackend.X11 else raylib_zig.LinuxDisplayBackend.Wayland,
         .raudio = false,
         .rmodels = false,
         .rshapes = true,

@@ -13,8 +13,16 @@ const width: i32 = @intFromFloat(aspect_ratio * height);
 pub fn init(title: [*:0]const u8) void {
     rl.setTraceLogLevel(.log_warning);
     rl.initWindow(width, height, title);
-    rl.setExitKey(rl.KeyboardKey.key_null);
-    rl.setTargetFPS(120);
+    if (builtin.mode == .Debug) {
+        // move the window to the center right of the screen
+        const padding_right = 50;
+        rl.setWindowPosition(1920 - width - padding_right, @divTrunc(1080, 2) - @divTrunc(height, 2));
+    }
+
+    if (builtin.mode != .Debug) {
+        rl.setExitKey(rl.KeyboardKey.key_null);
+        rl.setTargetFPS(120);
+    }
 }
 
 pub fn deinit() void {
