@@ -1,4 +1,5 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 const log = std.log.scoped(.@"saral/context");
 const rl = @import("raylib");
 
@@ -6,6 +7,7 @@ const Color = rl.Color;
 const Text = @import("text.zig");
 const Rect = @import("rect.zig");
 
+alloc: Allocator,
 x: f32,
 y: f32,
 max_width: f32,
@@ -44,6 +46,7 @@ pub fn rect(
     );
 
     var new_ctx = Self{
+        .alloc = self.alloc,
         .x = self.x + x,
         .y = self.y + y,
         .max_width = options.width,
@@ -60,6 +63,7 @@ pub inline fn text(
     options: Text.Options,
 ) void {
     return Text.render(
+        self.alloc,
         self.x,
         self.y,
         self.max_width,

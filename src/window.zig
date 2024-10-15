@@ -1,5 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
+const Allocator = std.mem.Allocator;
 const log = std.log.scoped(.@"saral/window");
 const rl = @import("raylib");
 
@@ -29,8 +30,9 @@ pub fn deinit() void {
     rl.closeWindow();
 }
 
-pub fn run(render_fn: fn (ctx: *const Context) void) void {
+pub fn run(alloc: Allocator, render_fn: fn (ctx: *const Context) void) void {
     var ctx: Context = .{
+        .alloc = alloc,
         .x = 0,
         .y = 0,
         .max_width = width,
@@ -40,9 +42,9 @@ pub fn run(render_fn: fn (ctx: *const Context) void) void {
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
-        if (builtin.mode == .Debug) {
-            rl.drawFPS(10, 10);
-        }
+        // if (builtin.mode == .Debug) {
+        rl.drawFPS(10, 10);
+        // }
         @call(std.builtin.CallModifier.always_inline, render_fn, .{&ctx});
     }
 }

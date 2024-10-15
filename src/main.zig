@@ -8,12 +8,18 @@ const Color = Sl.Color;
 const Rect = Sl.Rect;
 
 pub fn main() !void {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+
+    const allocator = gpa.allocator();
+
     Window.init("Raylib-zig");
     defer Window.deinit();
 
-    Window.run(struct {
+    Window.run(allocator, struct {
         pub fn render(ctx: *const Context) void {
-            ctx.clear(Color.black);
+            // a light shade of purple
+            ctx.clear(Color.init(200, 200, 255, 255));
 
             ctx.rect(.{
                 .position = Rect.Position.centerd(),
@@ -79,9 +85,11 @@ pub fn main() !void {
                         });
 
                         ctx1.text(.{
-                            .text = "Hello World!",
+                            .text = "Hello World! Hello, World!! even more stuff so that we can test the wrap feature",
                             .size = 80,
                             .color = Color.black,
+                            .alignment = .left,
+                            .wrap = .character,
                         });
                     }
                 }.render,
