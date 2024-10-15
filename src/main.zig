@@ -18,7 +18,6 @@ pub fn main() !void {
 
     Window.run(allocator, struct {
         pub fn render(ctx: *const Context) void {
-            // a light shade of purple
             ctx.clear(Color.init(200, 200, 255, 255));
 
             ctx.rect(.{
@@ -27,55 +26,37 @@ pub fn main() !void {
                 .height = ctx.max_height / 4,
                 .color = Color.red,
                 .child = struct {
+                    const positions = [_]Rect.Position{
+                        Rect.Position.topLeft(),
+                        Rect.Position.topCenter(),
+                        Rect.Position.topRight(),
+                        Rect.Position.centerLeft(),
+                        Rect.Position.centerd(),
+                        Rect.Position.centerRight(),
+                        Rect.Position.bottomLeft(),
+                        Rect.Position.bottomCenter(),
+                        Rect.Position.bottomRight(),
+                    };
+                    const colors = [_]Color{
+                        Color.yellow,
+                        Color.magenta,
+                        Color.lime,
+                        Color.blue,
+                        Color.purple,
+                        Color.orange,
+                        Color.brown,
+                        Color.white,
+                        Color.init(0, 0, 0, 100),
+                    };
                     pub fn render(ctx1: *const Context) void {
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.topCenter(),
-                            .color = Color.yellow,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.topRight(),
-                            .color = Color.magenta,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.centerLeft(),
-                            .color = Color.lime,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.centerd(),
-                            .color = Color.blue,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.centerRight(),
-                            .color = Color.purple,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.bottomLeft(),
-                            .color = Color.orange,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.bottomCenter(),
-                            .color = Color.brown,
-                        });
-                        ctx1.rect(.{
-                            .width = ctx1.max_width / 3,
-                            .height = ctx1.max_height / 3,
-                            .position = Rect.Position.bottomRight(),
-                            .color = Color.white,
-                        });
+                        for (positions, colors) |position, color| {
+                            ctx1.rect(.{
+                                .width = ctx1.max_width / 3,
+                                .height = ctx1.max_height / 3,
+                                .position = position,
+                                .color = color,
+                            });
+                        }
 
                         ctx1.rect(.{
                             .width = ctx1.max_width / 2,
@@ -85,7 +66,7 @@ pub fn main() !void {
                         });
 
                         ctx1.text(.{
-                            .text = "Hello World! Hello, World!! even more stuff so that we can test the wrap feature",
+                            .text = "Hello World! Hello, World!! even more stuff so that I can test the wrap feature",
                             .size = 80,
                             .color = Color.black,
                             .alignment = .left,
